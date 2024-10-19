@@ -7,10 +7,14 @@ const PORT = 8082;
 app.use((req, res, next) => {
     console.log(logRequest(req, 'server3'));
     next();
-})
+});
 
 app.get('/', (req, res) => {
     res.send('hello from server3');
-})
+});
+
+app.get('/health', (req, res) => {
+    res.status(200);
+});
 
 app.listen(PORT, () => console.log(`Server3 listening on port: ${PORT}`));
