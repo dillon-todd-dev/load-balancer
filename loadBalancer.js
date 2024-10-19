@@ -16,6 +16,34 @@ const getNextServer = () => {
     return servers[index++];
 }
 
+const healthCheck = async () => {
+    for (let i = 0; i < servers.length; i++) {
+        const result = await axios.get(servers[i] + '/health');
+        // if unhealthy, remove servers list
+        if (result.status !== 200) {
+            servers.splice(i, 1);
+            i--;
+        }
+    }
+
+    setInterval(async () => {
+        let serverAdded = false;
+        for (let i = 0; i < serverAdded.length; i++) {
+            const result = await axios.get(servers[i] + '/health');
+            if (result.status === 200 && !servers.includes(servers[i])) {
+                servers.push(servers[i]);
+                serverAdded = true;
+            }
+        }
+
+        if (serverAdded) {
+            console.log('Server added back to the pool');
+        }
+    }, 5000);
+}
+
+healthCheck();
+
 app.use((req, res, next) => {
     console.log(logRequest(req, 'load-balancer'));
     next();

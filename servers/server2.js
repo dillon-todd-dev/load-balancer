@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    res.status(200);
+    res.status(200).send('healthy');
 });
 
 app.listen(PORT, () => console.log(`Server2 listening on port: ${PORT}`));
