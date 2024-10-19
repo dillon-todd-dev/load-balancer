@@ -1,15 +1,24 @@
+import axios from 'axios';
 import express from 'express';
+import { logRequest } from './utils/utils.js';
 
 const app = express();
 const PORT = 80;
 
+const backendServer = 'http://localhost:8080';
+
 app.use((req, res, next) => {
-    console.log(`Received request from ${req.ip}\n${req.method} ${req.path} ${req.httpVersion}\nHost: ${req.hostname}\nUser-Agent: ${req.headers['user-agent']}\nAccept: ${req.headers.accept}`);
+    console.log(logRequest(req, 'load-balancer'));
     next();
 });
 
-app.get('*', (req, res) => {
-    res.status(200).send('this is the load balancer');
+app.get('*', async (req, res) => {
+    try {
+        const result = await axios.get(backendServer + req.url);
+        res.status(result.status).send(result.data);
+    } catch (error) {
+        res.status(500).send('Failed to connect to backend');
+    }
 });
 
 app.listen(PORT, () => console.log(`load-balancer listening on port: ${PORT}`));
